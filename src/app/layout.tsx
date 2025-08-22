@@ -25,24 +25,24 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-        <html lang="en">
-          <body className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden`}>
-            <ReactQueryProvider>
-              {children}
-              <ReactQueryDevtools initialIsOpen />
-            </ReactQueryProvider>
-            <Toaster
-              position="top-center"
-              toastOptions={{
-                classNames: {
-                  success: '!bg-green-500',
-                  error: '!bg-red-500',
-                  title: '!text-white',
-                  icon: '!text-white',
-                },
-              }}
-            />
-          </body>
-        </html>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden`}>
+        <ReactQueryProvider>
+          {children}
+          <ReactQueryDevtools initialIsOpen />
+        </ReactQueryProvider>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            classNames: {
+              success: '!bg-green-500',
+              error: '!bg-red-500',
+              title: '!text-white',
+              icon: '!text-white',
+            },
+          }}
+        />
+      </body>
+    </html>
   )
 }
