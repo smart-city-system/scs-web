@@ -2,8 +2,8 @@ import http from '@/lib/http'
 import type { LoginResponse, SuccessResApi, ValidateTokenResponse } from '@/types'
 
 class AuthService {
-  private baseUrl = '/api/auth'
-  private readonly loginUrl = '/login'
+  private basePath = '/api/v1'
+  private readonly loginUrl = '/auth/login'
   private readonly registerUrl = '/register'
   private readonly logoutUrl = '/logout'
 
@@ -11,35 +11,35 @@ class AuthService {
   private readonly validateTokenFromServerUrl = '/api/v1/auth/validate-token'
   private readonly loginFromServerUrl = '/api/v1/auth/login'
 
-  async login(email: string, password: string): Promise<LoginResponse> {
+  async login(email: string, password: string, baseUrl: string): Promise<LoginResponse> {
     const response = await http.post<SuccessResApi<LoginResponse>>(
-      `${this.baseUrl}${this.loginUrl}`,
+      `${this.basePath}${this.loginUrl}`,
       {
         email,
         password,
       },
-      { baseUrl: '' },
+      { baseUrl: baseUrl, skipAuth: true }, // Skip auth for login endpoint
     )
     return response.payload.data
   }
-  async loginFromServer(email: string, password: string, baseUrl: string): Promise<LoginResponse> {
+  async auth(token: string): Promise<LoginResponse> {
     const response = await http.post<SuccessResApi<LoginResponse>>(
-      this.loginFromServerUrl,
+      '/api/auth',
       {
-        email,
-        password,
+        token,
       },
-      { baseUrl },
+      { baseUrl: '', skipAuth: true }, // Skip auth for login endpoint
     )
     return response.payload.data
   }
+
   async validateToken(token: string, baseUrl: string): Promise<ValidateTokenResponse> {
     const response = await http.post<SuccessResApi<ValidateTokenResponse>>(
       this.validateTokenFromServerUrl,
       {
         token,
       },
-      { baseUrl },
+      { baseUrl, skipAuth: true }, // Skip auth for token validation
     )
     return response.payload.data
   }

@@ -35,10 +35,16 @@ export default function SignInPage() {
   }
   const loginMutation = useMutation(
     (data) => {
-      return authService.login(data.email.trim(), data.password)
+      return authService.login(
+        data.email.trim(),
+        data.password,
+        process.env.NEXT_PUBLIC_USER_ENDPOINT || '',
+      )
     },
     {
-      onSuccess: () => {
+      onSuccess: async (data) => {
+        await authService.auth(data.token)
+        localStorage.setItem('sessionToken', data.token)
         window.location.href = redirect
       },
     },

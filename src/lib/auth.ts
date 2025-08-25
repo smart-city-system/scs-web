@@ -22,7 +22,7 @@ export function customMiddleware(handler: MiddlewareHandler, options?: { signInU
     const token = req.cookies.get('sessionToken')?.value
     if (token) {
       const claims = getTokenClaims(token)
-      const baseUrl = process.env.USER_ENDPOINT as string
+      const baseUrl = process.env.NEXT_PUBLIC_USER_ENDPOINT as string
       const validation = await authService.validateToken(token, baseUrl)
       if (validation.valid) {
         isAuthenticated = true

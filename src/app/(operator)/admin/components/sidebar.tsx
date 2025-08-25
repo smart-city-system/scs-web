@@ -6,17 +6,17 @@ import { LayoutDashboard, ScanEye } from 'lucide-react'
 const items: NavItem[] = [
   {
     title: 'Dashboard',
-    url: '/dashboard',
+    url: '/admin/dashboard',
     icon: LayoutDashboard,
   },
   {
     title: 'Guidance Templates',
-    url: '/guidance-templates',
+    url: '/admin/guidance-templates',
     icon: ScanEye,
   },
   {
     title: 'Premises',
-    url: '/premises',
+    url: '/admin/premises',
     icon: ScanEye,
   },
   {
@@ -26,17 +26,17 @@ const items: NavItem[] = [
   },
   {
     title: 'Cameras',
-    url: '/cameras',
+    url: '/admin/cameras',
     icon: ScanEye,
   },
   {
     title: 'Guards',
-    url: '/guards',
+    url: '/admin/guards',
     icon: ScanEye,
   },
   {
     title: 'Settings',
-    url: '/settings',
+    url: '/admin/settings',
     icon: ScanEye,
   },
 ]

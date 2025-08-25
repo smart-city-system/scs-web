@@ -48,19 +48,9 @@ export interface UpdatePremiseRequest extends Partial<CreatePremiseRequest> {
 export interface Camera {
   id: string
   name: string
-  premiseId: string
-  premiseName?: string // For display purposes
-  location: string
-  ipAddress?: string
-  port?: number
-  username?: string
-  password?: string
-  streamUrl?: string
-  isActive: boolean
-  isOnline: boolean
-  lastSeen?: string
-  createdAt: string
-  updatedAt: string
+  location_description: string
+  premise_id?: string // For display purposes
+  is_active: string
 }
 
 export interface CreateCameraRequest {

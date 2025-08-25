@@ -1,5 +1,13 @@
 type CustomOptions = Omit<RequestInit, 'method'> & {
   baseUrl?: string | undefined
+  skipAuth?: boolean // Option to skip automatic token inclusion
+  // biome-ignore lint/suspicious/noExplicitAny: Simplified to avoid complex type intersections
+  body?: any
+}
+
+// Utility function to check if we're running on the client side
+const isClient = (): boolean => {
+  return typeof window !== 'undefined'
 }
 
 const request = async <Response>(
@@ -15,18 +23,20 @@ const request = async <Response>(
   }
   const baseHeaders: { [key: string]: string } =
     body instanceof FormData ? {} : { 'Content-Type': 'application/json' }
-  // if (isClient()) {
-  //   const sessionToken = localStorage.getItem('sessionToken')
-  //   if (sessionToken) {
-  //     baseHeaders.Authorization = `Bearer ${sessionToken}`
-  //   }
-  // }
+
+  // Automatic token interceptor - include token in headers if available and not skipped
+  if (isClient() && !options?.skipAuth) {
+    const sessionToken = localStorage.getItem('sessionToken')
+    if (sessionToken) {
+      baseHeaders.Authorization = `Bearer ${sessionToken}`
+    }
+  }
   const baseUrl =
     options?.baseUrl === undefined
       ? process.env.NEXT_PUBLIC_API_ENDPOINT || 'https://api.coursity.io.vn/api/v1'
       : options.baseUrl
 
-  const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`
+  const fullUrl = `${baseUrl}${url}`
   const res = await fetch(fullUrl, {
     ...options,
     headers: {
@@ -74,23 +84,31 @@ export class HttpError extends Error {
     this.payload = payload
   }
 }
-
-const http = {
+class Http {
   get<Response>(url: string, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('GET', url, options)
-  },
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   post<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('POST', url, { ...options, body })
-  },
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   patch<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('PATCH', url, { ...options, body })
-  },
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   put<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('PUT', url, { ...options, body })
-  },
+  }
+
   delete<Response>(url: string, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('DELETE', url, { ...options })
-  },
+  }
 }
+
+const http = new Http()
 
 export default http
