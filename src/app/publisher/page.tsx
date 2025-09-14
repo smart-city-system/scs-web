@@ -1,6 +1,17 @@
 'use client';
 import React, { useEffect, useRef, useState } from "react";
 import VideoPlayer from "../components/VideoPlayer";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { cameraService } from "@/services/cameraService";
+import { useQuery } from "@tanstack/react-query";
+import { Camera } from "@/types";
+import { Button } from "@/components/ui/button";
 
 interface SignalingMessage {
   type: string;
@@ -32,6 +43,13 @@ export default function Publisher() {
 
   const wsRef = useRef<WebSocket | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
+
+    const { data: cameras, isLoading: isLoadingCameras } = useQuery({
+    queryKey: ['cameras'],
+    queryFn: () => {
+      return cameraService.getAll()
+    },
+  })
 
   const initPublisher = async (camId: string) => {
     wsRef.current = new WebSocket("ws://localhost:1325/ws");
@@ -136,36 +154,45 @@ export default function Publisher() {
     setIsPublishing(true);
     initPublisher(cameraId.trim());
   };
-
+  const cameraOptions = cameras
+    ? cameras.data.map((camera) => ({
+        label: camera.name,
+        value: camera.id,
+      }))
+    : []
   return (
     <div>
-      <h1>Publisher</h1>
 
       {!isPublishing && (
-        <div style={{ marginBottom: "1rem" }}>
-          <label>
-            Camera ID:{" "}
-            <input
-              type="text"
-              value={cameraId}
-              onChange={(e) => setCameraId(e.target.value)}
-            />
-          </label>
-          <button onClick={handleStartPublishing} style={{ marginLeft: "0.5rem" }}>
+        <div style={{ marginBottom: "1rem" }} className="flex gap-2 justify-center mt-10">
+            <Select onValueChange={(value) => setCameraId(value)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Camera" />
+              </SelectTrigger>
+              <SelectContent>
+                {cameraOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+             
+              </SelectContent>
+            </Select>
+          <Button onClick={handleStartPublishing} style={{ marginLeft: "0.5rem" }}>
             Start Publishing
-          </button>
+          </Button>
         </div>
       )}
 
       {/* {isPublishing && <VideoPlayer stream={stream} muted />} */}
 
-      <div style={{ marginTop: "1rem" }}>
+      {/* <div style={{ marginTop: "1rem" }}>
         <p>WS Status: {wsStatus}</p>
         <p>ICE Status: {iceStatus}</p>
         <p>PC Status: {pcStatus}</p>
         <p>ICE Candidates Sent: {candidatesSent}</p>
         <p>ICE Candidates Received: {candidatesReceived}</p>
-      </div>
+      </div> */}
     </div>
   );
 }

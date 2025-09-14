@@ -6,10 +6,9 @@ import { premiseService } from '@/services/premiseService'
 import { Plus } from 'lucide-react'
 import { Suspense, useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { PremiseForm } from './components/premise-form'
 import type { ColumnDef } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
-import type { Premise, SortConfig, TableColumn } from '@/types'
+import type { Premise, SortConfig, TableColumn, User } from '@/types'
 import { useQuery } from '@tanstack/react-query'
 import {
   DropdownMenu,
@@ -21,26 +20,28 @@ import { DropdownMenuItem, DropdownMenuTrigger } from '@radix-ui/react-dropdown-
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import CustomTable from '@/components/custom/table'
-import Link from 'next/link'
+import { guardService } from '@/services/guardService'
+import { userService } from '@/services/userService'
+import UserForm from './components/user-form'
 
-function Premises() {
+function Guards() {
   const [searchQuery, setSearchQuery] = useState('')
   // const [sortConfig, setSortConfig] = useState<SortConfig>({
   //   key: 'name',
   //   direction: 'asc',
   // })
-  const [selectedPremise, setSelectedPremise] = useState<Premise | null>(null)
+  const [selectedPremise, setSelectPremise] = useState<Premise | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [premiseToDelete, setPremiseToDelete] = useState<Premise | null>(null)
+  const [userToDelete, setuserToDelete] = useState<Premise | null>(null)
   const [filters, setFilters] = useState<{ page: number; limit: number }>({
     page: 1,
     limit: 10,
   })
-  const { data: premises, isLoading } = useQuery({
-    queryKey: ['premises', filters.page],
+  const { data: users, isLoading } = useQuery({
+    queryKey: ['users', filters.page],
     queryFn: () => {
-      return premiseService.getAll({
+      return userService.getAll({
         search: searchQuery,
         page: filters.page,
         limit: filters.limit,
@@ -48,34 +49,30 @@ function Premises() {
     },
   })
 
-  const handleSearch = (value: string) => {
-    setSearchQuery(value)
-  }
-
   // const handleSort = (config: SortConfig) => {
   //   setSortConfig(config)
   // }
 
   const handleAdd = () => {
-    setSelectedPremise(null)
+    setSelectPremise(null)
     setIsFormOpen(true)
   }
 
   const handleEdit = (premise: Premise) => {
-    setSelectedPremise(premise)
+    setSelectPremise(premise)
     setIsFormOpen(true)
   }
 
   const handleDelete = (premise: Premise) => {
-    setPremiseToDelete(premise)
+    setuserToDelete(premise)
     setIsDeleteDialogOpen(true)
   }
 
   const confirmDelete = async () => {
-    if (!premiseToDelete) return
+    if (!userToDelete) return
 
     try {
-      await premiseService.delete(premiseToDelete.id)
+      await premiseService.delete(userToDelete.id)
       toast.success('Premise deleted successfully')
     } catch (error) {
       toast.error('Failed to delete premise')
@@ -83,21 +80,21 @@ function Premises() {
     }
   }
 
-  const handleFormSubmit = async (data: any) => {
-    try {
-      if (selectedPremise) {
-        await premiseService.update(selectedPremise.id, data)
-        toast.success('Premise updated successfully')
-      } else {
-        await premiseService.create(data)
-        toast.success('Premise created successfully')
-      }
-      setIsFormOpen(false)
-    } catch (error) {
-      toast.error(selectedPremise ? 'Failed to update premise' : 'Failed to create premise')
-      console.error('Error saving premise:', error)
-    }
-  }
+  // const handleFormSubmit = async (data: any) => {
+  //   try {
+  //     if (selectedGuard) {
+  //       await premiseService.update(selectedGuard.id, data)
+  //       toast.success('Premise updated successfully')
+  //     } else {
+  //       await premiseService.create(data)
+  //       toast.success('Premise created successfully')
+  //     }
+  //     setIsFormOpen(false)
+  //   } catch (error) {
+  //     toast.error(selectedGuard ? 'Failed to update guard' : 'Failed to create guard')
+  //     console.error('Error saving premise:', error)
+  //   }
+  // }
   // Handler function for pagination changes (page/limit)
 
   // Pagination state derived from URL params
@@ -110,7 +107,7 @@ function Premises() {
   )
 
   // Fetch course reviews using React Query
-  const columns: ColumnDef<Premise>[] = [
+  const columns: ColumnDef<User>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -149,19 +146,34 @@ function Premises() {
       cell: ({ row }) => <div className="lowercase">{row.getValue('name')}</div>,
     },
     {
-      accessorKey: 'address',
+      accessorKey: 'email',
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Address
+            Email
             <ArrowUpDown />
           </Button>
         )
       },
-      cell: ({ row }) => <div className="lowercase">{row.getValue('address')}</div>,
+      cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
+    },
+    {
+      accessorKey: 'role',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Email
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => <div className="lowercase">{row.getValue('role')}</div>,
     },
     {
       id: 'actions',
@@ -179,9 +191,7 @@ function Premises() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="p-2 cursor-pointer">
-                <Link href={`/admin/premises/${row.original.id}`}>View details</Link>
-              </DropdownMenuItem>
+              <DropdownMenuItem className="p-2 cursor-pointer">View details</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -210,38 +220,38 @@ function Premises() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Premises</h1>
-          <p className="text-muted-foreground">Manage your premises and locations</p>
+          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+          <p className="text-muted-foreground">Manage your users and locations</p>
         </div>
         <Button onClick={handleAdd}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Premise
+          Add User
         </Button>
       </div>
 
       <CustomTable
         isLoading={isLoading}
-        data={premises?.data || []}
+        data={users?.data || []}
         columns={columns}
         pagination={{
           pageIndex: pagination.pageIndex,
           pageSize: pagination.pageSize,
         }}
         paginationOptions={{
-          pageCount: premises?.pagination?.total_pages ?? 1,
+          pageCount: users?.pagination?.total_pages ?? 1,
           manualPagination: true,
           onPaginationChange: handlePaginationChange,
         }}
       />
 
-      <PremiseForm open={isFormOpen} onChange={() => setIsFormOpen(false)} />
+      <UserForm open={isFormOpen} onChange={() => setIsFormOpen(false)} />
     </div>
   )
 }
-export default function PremisesPage() {
+export default function SuspensePage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <Premises />
+      <Guards />
     </Suspense>
   )
 }

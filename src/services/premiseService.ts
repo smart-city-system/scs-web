@@ -6,6 +6,7 @@ import type {
   Premise,
   QueryParams,
   SuccessResApi,
+  User,
 } from '@/types'
 
 export interface PremiseQueryParams {
@@ -30,8 +31,13 @@ class PremiseService {
   }
 
   async getById(id: string): Promise<Premise> {
-    const response = await http.get<Premise>(`${this.baseUrl}/${id}`)
-    return response.payload
+    const response = await http.get<SuccessResApi<Premise>>(`${this.baseUrl}/${id}`)
+    return response.payload.data
+  }
+
+  async getAvailableUsers(premiseId: string): Promise<User[]> {
+    const response = await http.get<SuccessResApi<User[]>>(`${this.baseUrl}/${premiseId}/users`)
+    return response.payload.data
   }
 
   async create(data: CreatePremiseRequest): Promise<Premise> {
@@ -40,7 +46,7 @@ class PremiseService {
   }
 
   async update(id: string, data: Partial<CreatePremiseRequest>): Promise<Premise> {
-    const response = await http.put<Premise>(`${this.baseUrl}/${id}`, data)
+    const response = await http.patch<Premise>(`${this.baseUrl}/${id}`, data)
     return response.payload
   }
 
@@ -51,6 +57,17 @@ class PremiseService {
   async toggleActive(id: string): Promise<Premise> {
     const response = await http.patch<Premise>(`${this.baseUrl}/${id}/toggle-active`, {})
     return response.payload
+  }
+
+  async assignUsers(
+    premiseId: string,
+    addedUsers: string[],
+    removedUsers: string[],
+  ): Promise<void> {
+    await http.post<SuccessResApi<void>>(`${this.baseUrl}/${premiseId}/assign-users`, {
+      added_users: addedUsers,
+      removed_users: removedUsers,
+    })
   }
 
   // Get premises for dropdown/select options

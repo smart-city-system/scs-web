@@ -21,7 +21,7 @@ const items: NavItem[] = [
   },
   {
     title: 'Incidents',
-    url: '/incidents',
+    url: '/admin/incidents',
     icon: ScanEye,
   },
   {
@@ -30,8 +30,8 @@ const items: NavItem[] = [
     icon: ScanEye,
   },
   {
-    title: 'Guards',
-    url: '/admin/guards',
+    title: 'Users',
+    url: '/admin/users',
     icon: ScanEye,
   },
   {

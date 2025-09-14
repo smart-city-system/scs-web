@@ -18,18 +18,27 @@ export type MiddlewareHandler = (
 export function customMiddleware(handler: MiddlewareHandler, options?: { signInUrl?: string }) {
   return async (req: NextRequest) => {
     let isAuthenticated = false
-    let user = null
+    let user: any = null
     const token = req.cookies.get('sessionToken')?.value
     if (token) {
       const claims = getTokenClaims(token)
       const baseUrl = process.env.NEXT_PUBLIC_USER_ENDPOINT as string
-      const validation = await authService.validateToken(token, baseUrl)
-      if (validation.valid) {
-        isAuthenticated = true
-        user = {
-          user_id: claims.user_id,
-          role: claims.role,
+      try {
+        const validation = await authService.validateToken(token, baseUrl)
+        if (validation.valid) {
+          isAuthenticated = true
+          user = {
+            user_id: claims.user_id,
+            role: claims.role,
+          }
         }
+      } catch (error) {
+        return NextResponse.redirect(
+          new URL(
+            `${options?.signInUrl || '/sign-in'}?redirect=${encodeURIComponent(req.nextUrl.pathname)}`,
+            req.url,
+          ),
+        )
       }
     }
     const auth: AuthContext = {

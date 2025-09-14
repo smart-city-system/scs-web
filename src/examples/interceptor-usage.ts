@@ -65,9 +65,9 @@ export async function loginUser(email: string, password: string) {
     })
     
     // After successful login, store the token
-    if (response.payload.token) {
-      localStorage.setItem('sessionToken', response.payload.token)
-    }
+    // if (response.payload.token) {
+    //   localStorage.setItem('sessionToken', response.payload.token)
+    // }
     
     return response.payload
   } catch (error) {

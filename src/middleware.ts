@@ -6,6 +6,7 @@ const isProtectedRoute = createRouteMatcher(['/admin(.*)'])
 export default customMiddleware(
   async (auth, req) => {
     if (isProtectedRoute(req)) {
+      console.log('protected')
       return auth.protect()
     }
   },

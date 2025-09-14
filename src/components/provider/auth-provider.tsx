@@ -9,6 +9,7 @@ export function AuthProvider({
   initialIsAuthenticated,
 }: { children: React.ReactNode; initialUser: User; initialIsAuthenticated: boolean }) {
   const [user, setUser] = useState<User | null>(initialUser)
+  console.log({ initialUser })
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(initialIsAuthenticated)
 
   return <AuthContext.Provider value={{ user, isAuthenticated }}>{children}</AuthContext.Provider>

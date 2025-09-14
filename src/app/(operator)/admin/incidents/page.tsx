@@ -1,15 +1,13 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { premiseService } from '@/services/premiseService'
 import { Plus } from 'lucide-react'
 import { Suspense, useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { PremiseForm } from './components/premise-form'
 import type { ColumnDef } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
-import type { Premise, SortConfig, TableColumn } from '@/types'
+import type { Incident, Premise, SortConfig, TableColumn } from '@/types'
 import { useQuery } from '@tanstack/react-query'
 import {
   DropdownMenu,
@@ -21,9 +19,12 @@ import { DropdownMenuItem, DropdownMenuTrigger } from '@radix-ui/react-dropdown-
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import CustomTable from '@/components/custom/table'
+import { incidentService } from '@/services/incidentService'
+import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import dayjs from 'dayjs'
 
-function Premises() {
+function Incidents() {
   const [searchQuery, setSearchQuery] = useState('')
   // const [sortConfig, setSortConfig] = useState<SortConfig>({
   //   key: 'name',
@@ -37,16 +38,17 @@ function Premises() {
     page: 1,
     limit: 10,
   })
-  const { data: premises, isLoading } = useQuery({
-    queryKey: ['premises', filters.page],
+  const { data: incidents, isLoading } = useQuery({
+    queryKey: ['incidents', filters.page],
     queryFn: () => {
-      return premiseService.getAll({
+      return incidentService.getAll({
         search: searchQuery,
         page: filters.page,
         limit: filters.limit,
       })
     },
   })
+  console.log('Incidents data:', incidents)
 
   const handleSearch = (value: string) => {
     setSearchQuery(value)
@@ -110,7 +112,7 @@ function Premises() {
   )
 
   // Fetch course reviews using React Query
-  const columns: ColumnDef<Premise>[] = [
+  const columns: ColumnDef<Incident>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -149,19 +151,114 @@ function Premises() {
       cell: ({ row }) => <div className="lowercase">{row.getValue('name')}</div>,
     },
     {
-      accessorKey: 'address',
+      accessorKey: 'description',
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Address
+            Description
             <ArrowUpDown />
           </Button>
         )
       },
-      cell: ({ row }) => <div className="lowercase">{row.getValue('address')}</div>,
+      cell: ({ row }) => <div className="lowercase">{row.getValue('description')}</div>,
+    },
+    {
+      accessorKey: 'location',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Description
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => <div className="lowercase">{row.getValue('location')}</div>,
+    },
+    {
+      accessorKey: 'severity',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Severity
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <div className="">
+          <span
+            className={cn('font-semibold px-2 py-1 rounded-sm text-xs text-center mx-auto', {
+              'bg-red-200 border-red-200 text-red-900': row.getValue('severity') === 'high',
+              'bg-orange-200 border-orange-200 text-orange-900':
+                row.getValue('severity') === 'medium',
+              'bg-yellow-200 border-yellow-200 text-yellow-900': row.getValue('severity') === 'low',
+            })}
+          >
+            {row.getValue('severity')}
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'status',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Status
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => <div className="lowercase">{row.getValue('status')}</div>,
+    },
+    {
+      accessorKey: 'incident_guidance.assignee.name',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Assignee
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const assigneeName = row.original.incident_guidance.assignee.name
+        return <div className="lowercase">{assigneeName}</div>
+      },
+    },
+    {
+      accessorKey: 'created_at',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Datetime
+            <ArrowUpDown />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <div className="lowercase">
+          {dayjs(row.getValue('created_at')).format('YYYY-MM-DD HH:mm:ss')}
+        </div>
+      ),
     },
     {
       id: 'actions',
@@ -179,8 +276,8 @@ function Premises() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="p-2 cursor-pointer">
-                <Link href={`/admin/premises/${row.original.id}`}>View details</Link>
+              <DropdownMenuItem asChild>
+                <Link href={`/admin/incidents/${row.original.id}`}>View details</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -210,38 +307,38 @@ function Premises() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Premises</h1>
-          <p className="text-muted-foreground">Manage your premises and locations</p>
+          <h1 className="text-3xl font-bold tracking-tight">Incidents</h1>
+          <p className="text-muted-foreground">Manage your Incidents</p>
         </div>
         <Button onClick={handleAdd}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Premise
+          Add Incident
         </Button>
       </div>
 
       <CustomTable
         isLoading={isLoading}
-        data={premises?.data || []}
+        data={incidents?.data || []}
         columns={columns}
         pagination={{
           pageIndex: pagination.pageIndex,
           pageSize: pagination.pageSize,
         }}
         paginationOptions={{
-          pageCount: premises?.pagination?.total_pages ?? 1,
+          pageCount: incidents?.pagination?.total_pages ?? 1,
           manualPagination: true,
           onPaginationChange: handlePaginationChange,
         }}
       />
 
-      <PremiseForm open={isFormOpen} onChange={() => setIsFormOpen(false)} />
+      {/* <PremiseForm open={isFormOpen} onChange={() => setIsFormOpen(false)} /> */}
     </div>
   )
 }
 export default function PremisesPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <Premises />
+      <Incidents />
     </Suspense>
   )
 }

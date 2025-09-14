@@ -40,6 +40,14 @@ export interface CreatePremiseRequest {
   isActive?: boolean
 }
 
+export interface CreateUserRequest {
+  name: string
+  email: string
+  password: string
+  role: string
+  premise_id: string
+}
+
 export interface UpdatePremiseRequest extends Partial<CreatePremiseRequest> {
   id: string
 }
@@ -65,6 +73,16 @@ export interface CreateCameraRequest {
   isActive?: boolean
 }
 
+export interface CreateIncidentRequest {
+  name: string
+  description: string
+  location: string
+  severity: string
+  guidance_template_id: string
+  assignee_id: string
+  alarm_id: string
+}
+
 export interface UpdateCameraRequest extends Partial<CreateCameraRequest> {
   id: string
 }
@@ -88,7 +106,69 @@ export interface SortConfig {
 }
 export interface User {
   user_id: string
+  id: string
   role: string
+  name: string
+  email: string
+}
+
+export interface Incident {
+  id: string
+  name: string
+  alarm: Alarm
+  description: string
+  location: string
+  severity: 'low' | 'medium' | 'high'
+  incident_guidance: IncidentGuidance
+  status: string
+  incident_media: IncidentMedia[]
+}
+export interface IncidentMedia {
+  id: string
+  incident_id: string
+  media_type: string
+  file_url: string
+  file_name: string
+  file_type: string
+  created_at: string
+}
+export interface IncidentGuidance {
+  id: string
+  assignee: User
+  guidance_template_id: string
+  incident_guidance_steps: IncidentGuidanceStep[]
+}
+export interface IncidentGuidanceStep {
+  id: string
+  incident_guidance_id: string
+  title: string
+  step_number: number
+  description: string
+  is_completed?: boolean
+}
+export interface Alarm {
+  id: string
+  premise: Premise
+  type: string
+  description: string
+  severity: 'low' | 'medium' | 'high'
+  triggered_at: string
+  device: string
+}
+export interface GuidanceTemplate {
+  id: string
+  name: string
+  content: string
+  description: string
+  category: string
+  guidance_steps: GuidanceStep[]
+}
+export interface GuidanceStep {
+  id: string
+  guidance_template_id: string
+  title: string
+  step_number: number
+  description: string
 }
 export interface FilterConfig {
   search?: string
@@ -122,5 +202,10 @@ export const QueryParamsSchema = z.object({
   sort_by: z.string().optional(),
   sort_order: z.string().optional(),
 })
+
+export type WsMessage = {
+  event: string
+  payload: any
+}
 
 export type QueryParams = z.infer<typeof QueryParamsSchema>

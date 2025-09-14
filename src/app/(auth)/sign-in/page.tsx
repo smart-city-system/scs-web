@@ -8,6 +8,7 @@ import { useMutation } from '@/hooks/use-async'
 import { authService } from '@/services/authService'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -16,7 +17,7 @@ const loginSchema = z.object({
   password: z.string().nonempty(),
 })
 type FormData = z.infer<typeof loginSchema>
-export default function SignInPage() {
+function SignInPage() {
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/admin/dashboard'
   const {
@@ -111,4 +112,12 @@ export default function SignInPage() {
       </Card>
     </div>
   )
+}
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      {/* Your component that uses useSearchParams */}
+      <SignInPage />
+    </Suspense>
+  );
 }
