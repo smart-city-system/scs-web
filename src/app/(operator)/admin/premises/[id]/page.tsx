@@ -32,13 +32,13 @@ type FormData = z.infer<typeof createPremiseSchema>
 export default function PremiseDetail() {
   const { id } = useParams()
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const { data: premise, isPremiseLoading } = useQuery({
+  const { data: premise } = useQuery({
     queryKey: ['premise', id],
     queryFn: () => {
       return premiseService.getById(id as string)
     },
   })
-  const { data: availableUser, isUserLoading } = useQuery({
+  const { data: availableUser } = useQuery({
     queryKey: ['premise', id, 'users'],
     queryFn: () => {
       return premiseService.getAvailableUsers(id as string)

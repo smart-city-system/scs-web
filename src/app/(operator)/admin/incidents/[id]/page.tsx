@@ -8,33 +8,62 @@ import {
   Circle,
   Clock,
   User,
+  CircleCheck,
   ChartBarStacked,
   Calendar,
   MapPin,
   Flag,
+  ArrowLeft,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useParams, usePathname } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { incidentService } from '@/services/incidentService'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import LoadingButton from '@/components/custom/loading-button'
 
 export default function IncidentDetailsPage() {
   const { id } = useParams()
+  const router = useRouter()
   const { data: incident, isLoading } = useQuery({
     queryKey: ['incident', id],
     queryFn: () => {
       return incidentService.getById(id as string)
     },
   })
+  const { mutateAsync: completeIncident, isPending } = useMutation({
+    mutationFn: () => incidentService.complete(id as string),
+    onSuccess: () => {
+      router.push('/admin/incidents')
+    },
+  })
+  const handleBack = () => {
+    router.push('/admin/incidents')
+  }
   return (
     <div className="p-6 space-y-6">
       {/* Breadcrumb + Back */}
-      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-        <span>Incidents</span>
-        <span>/</span>
-        <span className="text-foreground font-medium">{incident?.name}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="sm" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">{incident?.name}</h1>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <LoadingButton
+            fallback="Marking as complete..."
+            isLoading={isPending}
+            onClick={() => completeIncident()}
+          >
+            Mark as complete
+          </LoadingButton>
+        </div>
       </div>
       <div className="grid grid-cols-12 gap-3">
         <div className="col-span-8 space-y-6">
@@ -142,6 +171,11 @@ export default function IncidentDetailsPage() {
                   <MapPin className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Location:</span>
                   <span className="text-sm">{incident?.location}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CircleCheck className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Status:</span>
+                  <span className="text-sm">{incident?.status}</span>
                 </div>
               </div>
             </CardContent>

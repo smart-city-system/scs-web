@@ -59,18 +59,19 @@ export interface Camera {
   location_description: string
   premise_id?: string // For display purposes
   is_active: string
+  premise: Premise
 }
 
 export interface CreateCameraRequest {
   name: string
-  premiseId: string
-  location: string
+  premise_id: string
+  location_description: string
+  is_active?: boolean
   ipAddress?: string
   port?: number
   username?: string
   password?: string
   streamUrl?: string
-  isActive?: boolean
 }
 
 export interface CreateIncidentRequest {
@@ -170,6 +171,51 @@ export interface GuidanceStep {
   step_number: number
   description: string
 }
+
+export interface CreateGuidanceTemplateRequest {
+  name: string
+  description: string
+  add_steps: CreateGuidanceStepRequest[]
+  remove_steps: string[]
+  update_steps: Partial<CreateGuidanceStepRequest>[]
+}
+
+export interface CreateGuidanceStepRequest {
+  title: string
+  step_number: number
+  description: string
+}
+
+export interface UpdateGuidanceTemplateRequest extends Partial<CreateGuidanceTemplateRequest> {
+  id: string
+}
+
+// Notification types
+export interface Notification {
+  id: string
+  title: string
+  message: string
+  type: 'info' | 'warning' | 'error' | 'success'
+  is_read: boolean
+  user_id: string
+  created_at: string
+  updated_at: string
+  metadata?: Record<string, unknown>
+}
+
+export interface CreateNotificationRequest {
+  title: string
+  message: string
+  type: 'info' | 'warning' | 'error' | 'success'
+  user_id: string
+  metadata?: Record<string, unknown>
+}
+
+export interface NotificationQueryParams extends QueryParams {
+  is_read?: boolean
+  type?: string
+  user_id?: string
+}
 export interface FilterConfig {
   search?: string
   isActive?: boolean
@@ -205,7 +251,7 @@ export const QueryParamsSchema = z.object({
 
 export type WsMessage = {
   event: string
-  payload: any
+  payload: unknown
 }
 
 export type QueryParams = z.infer<typeof QueryParamsSchema>

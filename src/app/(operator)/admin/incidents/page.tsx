@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { premiseService } from '@/services/premiseService'
-import { Plus } from 'lucide-react'
+import { Eye, Plus } from 'lucide-react'
 import { Suspense, useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -173,7 +173,7 @@ function Incidents() {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Description
+            Location
             <ArrowUpDown />
           </Button>
         )
@@ -277,7 +277,12 @@ function Incidents() {
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/admin/incidents/${row.original.id}`}>View details</Link>
+                <Link
+                  href={`/admin/incidents/${row.original.id}`}
+                  className="flex gap-1 p-2 items-center"
+                >
+                  <Eye className="mr-2 h-4 w-4" /> <span className="text-sm"> View details</span>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

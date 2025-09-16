@@ -58,8 +58,6 @@ export function UserForm({
     control,
     handleSubmit,
     formState: { errors },
-    watch,
-    setValue,
     reset,
   } = useForm<FormData>({
     defaultValues: {

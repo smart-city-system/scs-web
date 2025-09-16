@@ -1,9 +1,10 @@
 'use client'
+import NotificationDropdown from '@/components/notifications/notification-dropdown'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
 import { userService } from '@/services/userService'
 import { useQuery } from '@tanstack/react-query'
-import { Bell, User } from 'lucide-react'
+import { User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 function Header() {
   const [time, setTime] = useState(new Date())
@@ -26,9 +27,7 @@ function Header() {
           <div className="font-semibold text-sm">Saturday, Aug 2, 2025 </div>
           <div className="text-sm">{time.toLocaleTimeString()}</div>
         </div>
-        <Button type="button" size="icon">
-          <Bell />
-        </Button>
+        <NotificationDropdown />
         <div>
           <div className="font-semibold text-sm">{userData?.name}</div>
           <div className="text-xs">{userData?.role}</div>

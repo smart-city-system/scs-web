@@ -1,27 +1,24 @@
 'use client'
 
+import CustomTable from '@/components/custom/table'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { premiseService } from '@/services/premiseService'
-import { Plus } from 'lucide-react'
-import { Suspense, useCallback, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-import type { ColumnDef } from '@tanstack/react-table'
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
-import type { Premise, SortConfig, TableColumn, User } from '@/types'
-import { useQuery } from '@tanstack/react-query'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { DropdownMenuItem, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
-import { Badge } from '@/components/ui/badge'
-import { Checkbox } from '@/components/ui/checkbox'
-import CustomTable from '@/components/custom/table'
-import { guardService } from '@/services/guardService'
+import { premiseService } from '@/services/premiseService'
 import { userService } from '@/services/userService'
+import type { Premise, User } from '@/types'
+import { DropdownMenuItem, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+import { useQuery } from '@tanstack/react-query'
+import type { ColumnDef } from '@tanstack/react-table'
+import { ArrowUpDown, Eye, MoreHorizontal, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { Suspense, useCallback, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import UserForm from './components/user-form'
 
 function Guards() {
@@ -36,10 +33,10 @@ function Guards() {
   const [userToDelete, setuserToDelete] = useState<Premise | null>(null)
   const [filters, setFilters] = useState<{ page: number; limit: number }>({
     page: 1,
-    limit: 10,
+    limit: 3,
   })
   const { data: users, isLoading } = useQuery({
-    queryKey: ['users', filters.page],
+    queryKey: ['users', filters.page, filters.limit],
     queryFn: () => {
       return userService.getAll({
         search: searchQuery,
@@ -191,7 +188,14 @@ function Guards() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="p-2 cursor-pointer">View details</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <Link
+                  href={`/admin/users/${row.original.id}`}
+                  className="flex gap-1 p-2 items-center"
+                >
+                  <Eye size={16} /> <span className="text-sm"> View details</span>
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )

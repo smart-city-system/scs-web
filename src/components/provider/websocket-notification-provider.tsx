@@ -97,6 +97,7 @@ export function WebSocketNotificationProvider({
           case 'alarm':
             console.log('🚨 Alarm received:', data)
             queryClient.invalidateQueries({ queryKey: ['alarms'] })
+            queryClient.invalidateQueries({ queryKey: ['notifications'] })
             break
           default:
             console.log(`❓ Unknown message event: ${event}`, data)

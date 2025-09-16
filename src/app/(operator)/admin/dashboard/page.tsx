@@ -12,6 +12,7 @@ import { alarmService } from '@/services/alarmService'
 import AlarmDetail from './components/alarm-detail'
 import type { Alarm } from '@/types'
 import { useWebsocketNotification } from '@/hooks/use-websocket'
+import { TestNotificationButton } from '@/components/notifications/test-notification-button'
 
 function DashboardPage() {
   const { user } = useAuth()
@@ -28,7 +29,11 @@ function DashboardPage() {
     [key: string]: 'connecting' | 'connected' | 'failed' | 'disconnected'
   }>({})
 
-  const { data: alarms, isLoading: isLoadingAlarms, error: alarmsError } = useQuery({
+  const {
+    data: alarms,
+    isLoading: isLoadingAlarms,
+    error: alarmsError,
+  } = useQuery({
     queryKey: ['alarms'],
     queryFn: async () => {
       const result = await alarmService.getAlarms({ status: 'new' })
@@ -36,8 +41,6 @@ function DashboardPage() {
     },
   })
 
-  useEffect(() => {
-  }, [alarms, isLoadingAlarms, alarmsError])
   const { data: premises } = useQuery({
     queryKey: ['premises', filters.page],
     queryFn: () => {
@@ -54,7 +57,7 @@ function DashboardPage() {
         premise_id: selectedPremise as string,
       })
     },
-    enabled: !!premises,
+    enabled: !!selectedPremise,
   })
   const wsRTCValue = useWebsocketRTC()
 
@@ -206,7 +209,9 @@ function DashboardPage() {
 
         if (msg.type === 'answer') {
           const answer = { type: 'answer', sdp: msg.sdp.sdp }
-          await pcsRef.current[msg.cameraId].setRemoteDescription(answer as RTCSessionDescriptionInit)
+          await pcsRef.current[msg.cameraId].setRemoteDescription(
+            answer as RTCSessionDescriptionInit,
+          )
           console.log('✅ Answer processed for camera:', msg.cameraId)
         }
 
@@ -250,7 +255,6 @@ function DashboardPage() {
     }
   }, [wsRTCValue, cleanupPeerConnections])
 
-
   useEffect(() => {
     if (wsRTCValue?.wsRTC && cameras && cameras.data.length > 0) {
       const ws = wsRTCValue.wsRTC
@@ -270,8 +274,12 @@ function DashboardPage() {
       }
     }
   }, [wsRTCValue, cameras, setupPeerConnection, user?.user_id])
+
   return (
     <>
+      <div className="flex justify-between items-center p-4">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+      </div>
       <div className="grid grid-cols-12 gap-2">
         <div className="col-span-3">
           <div className="text-md m-3 font-semibold">Premises</div>
@@ -347,9 +355,7 @@ function DashboardPage() {
           </h2>
           <div>
             {isLoadingAlarms && (
-              <div className="mt-2 p-4 text-center text-gray-500">
-                Loading alarms...
-              </div>
+              <div className="mt-2 p-4 text-center text-gray-500">Loading alarms...</div>
             )}
             {alarmsError && (
               <div className="mt-2 p-4 text-center text-red-500">
@@ -357,12 +363,9 @@ function DashboardPage() {
               </div>
             )}
             {alarms && alarms.length === 0 && !isLoadingAlarms && (
-              <div className="mt-2 p-4 text-center text-gray-500">
-                No alarms found
-              </div>
+              <div className="mt-2 p-4 text-center text-gray-500">No alarms found</div>
             )}
             {alarms?.map((alarm, index) => {
-              console.log('🎨 Rendering alarm:', alarm)
               return (
                 <div className="mt-2" key={alarm.id || index}>
                   <AlarmComponent

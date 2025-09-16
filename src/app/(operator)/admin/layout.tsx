@@ -6,6 +6,7 @@ import Sidebar from './components/sidebar'
 import { AuthProvider } from '@/components/provider/auth-provider'
 import WebSocketRTCProvider from '@/components/provider/websocket-rtc-provider'
 import WebSocketNotificationProvider from '@/components/provider/websocket-notification-provider'
+import { NotificationProvider } from '@/contexts/notification-context'
 
 async function OperatorLayout({ children }: { children: React.ReactNode }) {
   const h = await headers()
@@ -17,16 +18,16 @@ async function OperatorLayout({ children }: { children: React.ReactNode }) {
         <Sidebar />
       </div>
       <AuthProvider initialIsAuthenticated={isAuthenticated} initialUser={user}>
-        <div className="flex flex-col w-full">
-          <Header />
-          <div className="p-2">
-            {/* <WebSocketNotificationProvider> */}
-            {/* <WebSocketRTCProvider> */}
-            {children}
-            {/* </WebSocketRTCProvider> */}
-            {/* </WebSocketNotificationProvider> */}
-          </div>
-        </div>
+        <WebSocketNotificationProvider>
+          <NotificationProvider>
+            <div className="flex flex-col w-full">
+              <Header />
+              <div className="p-2">
+                <WebSocketRTCProvider>{children}</WebSocketRTCProvider>
+              </div>
+            </div>
+          </NotificationProvider>
+        </WebSocketNotificationProvider>
       </AuthProvider>
     </SidebarProvider>
   )

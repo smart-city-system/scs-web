@@ -35,6 +35,10 @@ class IncidentService {
     )
     return response.payload.data
   }
+  async complete(id: string): Promise<void> {
+    const response = await http.patch<SuccessResApi<void>>(`${this.baseUrl}/${id}/complete`, {})
+    return response.payload.data
+  }
 }
 
 export const incidentService = new IncidentService()

@@ -181,7 +181,7 @@ export function CreateIncident({
       })
     },
   })
-  const { mutateAsync: updateAlarmStatus, isPending: isUpdatingAlarm } = useMutation({
+  const { mutateAsync: updateAlarmStatus } = useMutation({
     mutationFn: async (args: { alarm_id: string; status: string }) => {
       return alarmService.updateAlarmStatus(args.alarm_id, args.status)
     },

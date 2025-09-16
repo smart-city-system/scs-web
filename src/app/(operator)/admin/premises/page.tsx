@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { premiseService } from '@/services/premiseService'
-import { Plus } from 'lucide-react'
+import { Eye, Plus } from 'lucide-react'
 import { Suspense, useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { PremiseForm } from './components/premise-form'
@@ -179,8 +179,13 @@ function Premises() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="p-2 cursor-pointer">
-                <Link href={`/admin/premises/${row.original.id}`}>View details</Link>
+              <DropdownMenuItem className="cursor-pointer">
+                <Link
+                  href={`/admin/premises/${row.original.id}`}
+                  className="flex gap-1 p-2 items-center"
+                >
+                  <Eye className="mr-2 h-4 w-4" /> <span className="text-sm"> View details</span>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

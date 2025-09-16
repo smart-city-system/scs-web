@@ -1,7 +1,7 @@
 'use client'
 import { AppSidebar, type NavItem } from '@/components/custom/app-sidebar'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { LayoutDashboard, ScanEye } from 'lucide-react'
+import { LayoutDashboard, ScanEye, Building, Users, Settings, Cctv } from 'lucide-react'
 // Menu items.
 const items: NavItem[] = [
   {
@@ -11,13 +11,13 @@ const items: NavItem[] = [
   },
   {
     title: 'Guidance Templates',
-    url: '/admin/guidance-templates',
+    url: '/admin/guidance',
     icon: ScanEye,
   },
   {
     title: 'Premises',
     url: '/admin/premises',
-    icon: ScanEye,
+    icon: Building,
   },
   {
     title: 'Incidents',
@@ -27,17 +27,17 @@ const items: NavItem[] = [
   {
     title: 'Cameras',
     url: '/admin/cameras',
-    icon: ScanEye,
+    icon: Cctv,
   },
   {
     title: 'Users',
     url: '/admin/users',
-    icon: ScanEye,
+    icon: Users,
   },
   {
     title: 'Settings',
     url: '/admin/settings',
-    icon: ScanEye,
+    icon: Settings,
   },
 ]
 function Sidebar() {

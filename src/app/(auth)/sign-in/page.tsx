@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useMutation } from '@/hooks/use-async'
+import { HttpError } from '@/lib/http'
 import { authService } from '@/services/authService'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -31,6 +32,7 @@ function SignInPage() {
     },
     resolver: zodResolver(loginSchema),
   })
+  const [error, setError] = useState<string | null>(null)
   const onSubmit = (data: FormData) => {
     loginMutation.mutate(data)
   }
@@ -46,7 +48,18 @@ function SignInPage() {
       onSuccess: async (data) => {
         await authService.auth(data.token)
         localStorage.setItem('sessionToken', data.token)
+        setError(null)
         window.location.href = redirect
+      },
+      onError: (error) => {
+        if (error instanceof HttpError) {
+          if (error.status === 401) {
+            setError('Invalid email or password')
+            return
+          }
+        } else {
+          setError('An error occurred. Please try again.')
+        }
       },
     },
   )
@@ -57,8 +70,10 @@ function SignInPage() {
         <CardHeader>
           <CardTitle className="text-center text-xl font-semibold">Login</CardTitle>
         </CardHeader>
-
-        <CardContent className="space-y-4">
+        <div className="h-[10px]">
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        </div>
+        <CardContent className="space-y-1">
           {/* OAuth buttons */}
           {/* <div className="flex gap-2">
             <Button variant="outline" className="w-1/2">
@@ -78,6 +93,7 @@ function SignInPage() {
           </div> */}
 
           {/* Email + Password form */}
+
           <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-1">
               <Controller
@@ -105,7 +121,7 @@ function SignInPage() {
             </div>
 
             <Button type="submit" className="w-full">
-              Create account
+              Sign in
             </Button>
           </form>
         </CardContent>
@@ -119,5 +135,5 @@ export default function Page() {
       {/* Your component that uses useSearchParams */}
       <SignInPage />
     </Suspense>
-  );
+  )
 }
