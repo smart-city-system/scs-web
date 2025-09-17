@@ -36,12 +36,15 @@ export function WebSocketRTCProvider({
     }
   }
   const createConnection = () => {
-    console.log(`🔄 Attempting RTC WebSocket connection (attempt ${retryCountRef.current + 1}/${MAX_RETRY_ATTEMPTS})`)
+    console.log(
+      `🔄 Attempting RTC WebSocket connection (attempt ${retryCountRef.current + 1}/${MAX_RETRY_ATTEMPTS})`,
+    )
     setConnectionStatus('connecting')
 
     try {
       // Try to connect with additional debugging
-      const websocket = new WebSocket('ws://localhost:1325/ws')
+      const cameraUrl = process.env.NEXT_PUBLIC_CAMERA_ENDPOINT
+      const websocket = new WebSocket(`ws://${cameraUrl?.slice(8)}/ws`)
 
       setWs(websocket)
 
@@ -75,14 +78,13 @@ export function WebSocketRTCProvider({
         }
       }
 
-
       websocket.onclose = (event) => {
         console.log('❌ WebSocket RTC disconnected - Code:', event.code, 'Reason:', event.reason)
         console.log('🔍 Close event details:', {
           code: event.code,
           reason: event.reason,
           wasClean: event.wasClean,
-          type: event.type
+          type: event.type,
         })
 
         // Common close codes:

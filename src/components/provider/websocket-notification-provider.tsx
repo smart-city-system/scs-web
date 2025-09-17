@@ -55,8 +55,10 @@ export function WebSocketNotificationProvider({
       }/${MAX_RETRY_ATTEMPTS})`,
     )
     setConnectionStatus('connecting')
-
-    const websocket = new WebSocket(`ws://localhost:4000/notifications?token=${token}`)
+    const notificationUrl = process.env.NEXT_PUBLIC_NOTIFICATION_ENDPOINT
+    const websocket = new WebSocket(
+      `ws://${notificationUrl?.slice(8)}/notifications?token=${token}`,
+    )
     setWs(websocket)
 
     // Set connection timeout
