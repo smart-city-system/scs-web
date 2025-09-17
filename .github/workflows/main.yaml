@@ -47,10 +47,10 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: erik1303/scss:scs-web
           build-args: |
-            NEXT_PUBLIC_USER_ENDPOINT=http://scs-user:1323
-            NEXT_PUBLIC_API_ENDPOINT=http://scs-operator:1323
-            NEXT_PUBLIC_CAMERA_ENDPOINT=http://scs-camera:1323
-            NEXT_PUBLIC_NOTIFICATION_ENDPOINT=http://scs-notification:3000
+            NEXT_PUBLIC_USER_ENDPOINT=http://scs-user.coursity.io.vn
+            NEXT_PUBLIC_API_ENDPOINT=http://scs-operator.coursity.io.vn
+            NEXT_PUBLIC_CAMERA_ENDPOINT=http://scs-camera.coursity.io.vn
+            NEXT_PUBLIC_NOTIFICATION_ENDPOINT=http://scs-notification.coursity.io.vn
 
   # deploy:
   #   environment: development
