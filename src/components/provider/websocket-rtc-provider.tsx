@@ -44,7 +44,7 @@ export function WebSocketRTCProvider({
     try {
       // Try to connect with additional debugging
       const cameraUrl = process.env.NEXT_PUBLIC_CAMERA_ENDPOINT
-      const websocket = new WebSocket(`ws://${cameraUrl?.slice(8)}/ws`)
+      const websocket = new WebSocket(`wss://${cameraUrl?.slice(8)}/ws`)
 
       setWs(websocket)
 

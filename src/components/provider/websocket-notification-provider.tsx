@@ -57,7 +57,7 @@ export function WebSocketNotificationProvider({
     setConnectionStatus('connecting')
     const notificationUrl = process.env.NEXT_PUBLIC_NOTIFICATION_ENDPOINT
     const websocket = new WebSocket(
-      `ws://${notificationUrl?.slice(8)}/notifications?token=${token}`,
+      `wss://${notificationUrl?.slice(8)}/notifications?token=${token}`,
     )
     setWs(websocket)
 
